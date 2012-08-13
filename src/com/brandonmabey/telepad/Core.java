@@ -12,9 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Core extends JavaPlugin {
 
-	private HashMap<String, PlayerHomes> homeMap = new HashMap<String, PlayerHomes>(5); //TODO make only as large as neccessary
+	private HashMap<String, PlayerHomes> homeMap;
+	private HashMap<String, Integer> lastUseMap;
+	int currentTick = 0;
 
 	private static final String SAVE_FILE_NAME = "telepad.sav";
+	private static final int TIME_BETWEEN_USES = 10; //seconds
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -22,9 +25,24 @@ public class Core extends JavaPlugin {
 			return onHomeCommand(sender, command, label, args);
 		} else if (command.getName().equalsIgnoreCase("sethome")) {
 			return onSetHomeCommand(sender, command, label, args);
+		} else if (command.getName().equalsIgnoreCase("listhome")) {
+			return onListHomeCommand(sender, command, label, args);
 		} else {
 			return false;
 		}
+	}
+	
+	private boolean onListHomeCommand(CommandSender sender, Command command, String label, String[] args) {
+		
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Command can only be used as a player, not from the console");
+			return false;
+		}
+		
+		PlayerHomes playerHomes = getPlayerHomes(sender.getName());
+		sender.sendMessage(playerHomes.getHomeStringNames());
+		
+		return true;
 	}
 
 	private boolean onSetHomeCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -40,8 +58,10 @@ public class Core extends JavaPlugin {
 		String homeName;
 		if (args.length == 0) {
 			homeName = "";
+			sender.sendMessage(ChatColor.GRAY + "Setting default home!");
 		} else {
 			homeName = args[0];
+			sender.sendMessage(ChatColor.GRAY + "Setting home called: " + homeName);
 		}
 		
 		ph.addHomeForName(homeName, new Home(p.getWorld().getName(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ()));
@@ -56,6 +76,19 @@ public class Core extends JavaPlugin {
 			homeMap.put(s, new PlayerHomes(null, this.getLogger()));
 			return homeMap.get(s);
 		}
+	}
+	
+	private int getLastPlayerCommand(String player) {
+		if (lastUseMap.containsKey(player)) {
+			return lastUseMap.get(player);
+		} else {
+			lastUseMap.put(player, 0);
+			return -TIME_BETWEEN_USES;
+		}
+	}
+	
+	private void setLastPlayerCommand(String player) {
+		lastUseMap.put(player, this.currentTick);
 	}
 
 	private boolean onHomeCommand(CommandSender sender, Command command,String label, String[] args) {
@@ -80,13 +113,20 @@ public class Core extends JavaPlugin {
 			return true;
 		}
 		if (homeName != "") {
-			sender.sendMessage(ChatColor.GRAY + "Going to your default home.");
-		} else {
 			sender.sendMessage(ChatColor.GRAY + "Going to your home called: " + homeName);
+		} else {
+			sender.sendMessage(ChatColor.GRAY + "Going to your default home.");
 		}
+		
+		int lastUse = getLastPlayerCommand(sender.getName());
+		if (lastUse > this.currentTick - TIME_BETWEEN_USES) {
+			sender.sendMessage(ChatColor.YELLOW + "You can not use /home for another " + (lastUse - (this.currentTick - TIME_BETWEEN_USES)) + " seconds.");
+			return true;
+		}
+		
 		this.getLogger().info(sender.getName() + " is teleporting to their home at " + location.getX() + ", " + location.getY() + ", " + location.getZ());
 		p.teleport(new Location(p.getWorld(), location.getX(), location.getY(), location.getZ()));
-		
+		setLastPlayerCommand(sender.getName());
 		return true;
 	}
 
@@ -111,10 +151,13 @@ public class Core extends JavaPlugin {
 		
 		File f = getDataFile(SAVE_FILE_NAME, true);
 		if (f == null) {
-			return;
+			this.homeMap = new HashMap<String, PlayerHomes>(0);
 		} else {
-			TelepadLoad.getLoadMap(f, this.getLogger());
+			this.homeMap = TelepadLoad.getLoadMap(f, this.getLogger());
 		}
+		
+		this.lastUseMap = new HashMap<String, Integer>(0);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickUpdater(this), TIME_BETWEEN_USES, TIME_BETWEEN_USES);
 	}
 	
 	public static void main(String args[]) {
@@ -160,6 +203,10 @@ public class Core extends JavaPlugin {
 	        }
 	    }
 	    return null;
+	}
+
+	public void resetTicks() {
+		lastUseMap = new HashMap<String, Integer>(0);
 	}
 	
 	

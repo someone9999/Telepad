@@ -15,13 +15,14 @@ public class TelepadSave {
 		}
 		
 		BufferedWriter fw = new BufferedWriter(new FileWriter(f));
+		fw.write(homes.size() + "\n");
 		
 		
 		for (String playerKey : homes.keySet()) {
 			fw.write(SaveFileConstants.PLAYER_DELIMETER);
 			fw.write(playerKey);
-			fw.write(homes.get(playerKey).getSaveString());
 			fw.write(SaveFileConstants.PLAYER_DELIMETER);
+			fw.write(homes.get(playerKey).getSaveString());
 			fw.write("\n");
 		}
 		

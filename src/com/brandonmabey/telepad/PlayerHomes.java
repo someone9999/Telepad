@@ -1,32 +1,30 @@
 package com.brandonmabey.telepad;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Logger;
+
+import org.bukkit.ChatColor;
 
 public class PlayerHomes {
 	private HashMap<String, Home> pHomes;
 	private Logger log;
 	
 	
-	public PlayerHomes(File fLocation, Logger log) {
-		if (fLocation == null) {
-			this.pHomes = new HashMap<String, Home>(0);
-		}
-		
+	public PlayerHomes(String loader, Logger log) {
+
 		this.log = log;
+		
+		if (loader == null) {
+			this.pHomes = new HashMap<String, Home>(0);
+		} else {
+			
+			this.loadString(loader);
+			
+		}
 	}
 	
 	public boolean addHomeForName(String homeName, Home location) {
-		HashMap<String, Home> newHomes;
-		if (pHomes.get(homeName) == null) {
-			newHomes = new HashMap<String, Home>(1);
-		} else {
-			newHomes = new HashMap<String, Home>(pHomes.size() + 1);
-		}
-		newHomes.putAll(pHomes);
-		newHomes.put(homeName, location);
-		this.pHomes = newHomes;
+		this.pHomes.put(homeName, location);
 		return true;
 	}
 	
@@ -42,14 +40,62 @@ public class PlayerHomes {
 	
 	public String getSaveString() {
 		
-		String returnString = SaveFileConstants.HOME_DELIMETER;
+		String returnString = "";
 		
 		for (String homeKey : pHomes.keySet()) {
-			returnString += homeKey;
-			returnString += pHomes.get(homeKey).getSaveString();
 			returnString += SaveFileConstants.HOME_DELIMETER;
+			returnString += homeKey;
+			returnString += SaveFileConstants.HOME_DELIMETER;
+			returnString += pHomes.get(homeKey).getSaveString();
 		}
 		
 		return returnString;
+	}
+	
+	private void loadString(String loadString) {
+		try {
+			
+//			log.info("playerHomes got string: " + loadString);
+			
+			String homeStrings[] = loadString.split("\\Q" + SaveFileConstants.HOME_DELIMETER + "\\E");
+			int numberOfHomes = (homeStrings.length - 1) / 2;
+			HashMap<String, Home> loadedHashMap = new HashMap<String, Home>(numberOfHomes);
+			
+			for (int i = 0; i < numberOfHomes; i++) {
+				int homeIndex = i * 2 + 1;
+				String key = homeStrings[homeIndex];
+				Home value = new Home(homeStrings[homeIndex + 1], log);
+				loadedHashMap.put(key, value);
+			}
+			
+			this.pHomes = loadedHashMap;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String[] getHomeStringNames() {
+		if (pHomes == null || pHomes.size() == 0) {
+			return new String[] { ChatColor.GRAY + "No homes set." } ;
+		} else {
+			String homeStrings[] = new String[pHomes.size()];
+			int counter = 0;
+			
+			for (String homeKey : pHomes.keySet()) {
+				String message;
+				if (homeKey == null || homeKey == "") {
+					message = "default home";
+				} else {
+					message = homeKey;
+				}
+				
+				homeStrings[counter] = ChatColor.GRAY + message;
+				counter++;
+			}
+			
+			return homeStrings;
+			
+		}
 	}
 }

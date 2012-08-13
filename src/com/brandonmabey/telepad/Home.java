@@ -1,5 +1,7 @@
 package com.brandonmabey.telepad;
 
+import java.util.logging.Logger;
+
 import org.bukkit.World;
 
 public class Home {
@@ -13,6 +15,24 @@ public class Home {
 		this.locX = x;
 		this.locY = y;
 		this.locZ = z;
+	}
+	
+	public Home(String loadString, Logger log) {
+//		log.info("Home got string " + loadString);
+		
+		try {
+			
+			String infoString[] = loadString.split("\\Q" + SaveFileConstants.HOME_INFO_DELIMETER + "\\E");
+			
+			this.worldName = infoString[1];
+			this.locX = Double.valueOf(infoString[2]);
+			this.locY = Double.valueOf(infoString[3]);
+			this.locZ = Double.valueOf(infoString[4]);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public double getX() {

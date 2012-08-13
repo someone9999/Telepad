@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -25,16 +24,23 @@ public class TelepadLoad {
 			return null;
 		}
 		
-		String loadString;
+		HashMap<String, PlayerHomes> loadedHashMap;
 		try {
-			loadString = br.readLine();
-		} catch (IOException e) {
+			int sizeOfHash = Integer.valueOf(br.readLine());
+			loadedHashMap = new HashMap<String, PlayerHomes>(sizeOfHash);
+			
+			for (int i = 0; i < sizeOfHash; i++) {
+				String playerString[] = br.readLine().split("\\Q" + SaveFileConstants.PLAYER_DELIMETER + "\\E");
+				String key = playerString[1];
+				PlayerHomes value = new PlayerHomes(playerString[2], log);
+				loadedHashMap.put(key, value);
+			}
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		
-		log.info("Loading hashmaps: " + loadString);
-		return null;
+		return loadedHashMap;
 		
 	}
 	

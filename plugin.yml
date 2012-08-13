@@ -10,3 +10,6 @@ commands:
    sethome:
       description: Sets your default home, or the home with the set name.
       usage: /sethome [optional name]
+   listhome:
+      description: Lists all your homes by name.
+      usage: /listhome
