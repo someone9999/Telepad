@@ -1,0 +1,12 @@
+name: Telepad
+main: com.brandonmabey.telepad.Core
+version: 0.0.0.1
+description: >
+             A telepad and home plugin
+commands:
+   home:
+      description: Teleports you to your set home, or the home with the name.
+      usage: /home [optional name]
+   sethome:
+      description: Sets your default home, or the home with the set name.
+      usage: /sethome [optional name]
