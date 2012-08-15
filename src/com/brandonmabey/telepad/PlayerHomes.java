@@ -83,19 +83,24 @@ public class PlayerHomes {
 			int counter = 0;
 			
 			for (String homeKey : pHomes.keySet()) {
-				String message;
-				if (homeKey == null || homeKey == "") {
-					message = "default home";
+				String homeName;
+				Home h = pHomes.get(homeKey);
+				if (homeKey.equalsIgnoreCase("") || homeKey == null) {
+					homeName = "Default home";
 				} else {
-					message = homeKey;
+					homeName = homeKey;
 				}
 				
-				homeStrings[counter] = ChatColor.GRAY + message;
+				homeStrings[counter] = ChatColor.YELLOW + homeName + ChatColor.GRAY + " with coordinates " + ChatColor.YELLOW + "(" + (int)h.getX() + ", " + (int)h.getY() + ", " + (int)h.getZ() + ")" + ChatColor.GRAY + ".";
 				counter++;
 			}
 			
 			return homeStrings;
 			
 		}
+	}
+
+	public void removeHome(String string) {
+		pHomes.remove(string);
 	}
 }

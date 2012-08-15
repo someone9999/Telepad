@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class TelepadLoad {
 
-	public static HashMap<String, PlayerHomes> getLoadMap(File f, Logger log) {
+	public static HashMap<String, PlayerHomes> loadHomes(File f, Logger log) {
 		
 		if (f == null) {
 			return null;
@@ -42,6 +42,36 @@ public class TelepadLoad {
 		}
 		return loadedHashMap;
 		
+	}
+	
+	public static HashMap<String, Teleporter> loadTelepads(File f, Logger log) {
+		
+		if (f == null) {
+			return null;
+		}
+		
+		try {
+			
+			BufferedReader br = new BufferedReader(new FileReader(f));
+			
+			int telepadNumber = Integer.valueOf(br.readLine());
+			
+			HashMap<String, Teleporter> telepadMap = new HashMap<String, Teleporter>(telepadNumber);
+			
+			for (int i = 0; i < telepadNumber; i++) {
+				String telepadData[] = br.readLine().split("\\Q" + SaveFileConstants.TELEPAD_DELIMETER + "\\E");
+				
+				Teleporter tp = new Teleporter(telepadData[1], Integer.valueOf(telepadData[2]), Integer.valueOf(telepadData[3]), Integer.valueOf(telepadData[4]), Integer.valueOf(telepadData[5]), Integer.valueOf(telepadData[6]), Integer.valueOf(telepadData[7]), Float.valueOf(telepadData[8]));
+				telepadMap.put(telepadData[0], tp);
+				
+			}
+			
+			return telepadMap;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

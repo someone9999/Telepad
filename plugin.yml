@@ -5,11 +5,23 @@ description: >
              A telepad and home plugin
 commands:
    home:
-      description: Teleports you to your set home, or the home with the name.
-      usage: /home [optional name]
+      description: Teleports you to your default home, or the home with the set name.
+      usage: /home [Home Name]
    sethome:
       description: Sets your default home, or the home with the set name.
-      usage: /sethome [optional name]
-   listhome:
+      usage: /sethome [Home Name]
+   homelist:
       description: Lists all your homes by name.
-      usage: /listhome
+      usage: /homelist
+   homedel:
+      description: Deletes the home by name.
+      usage: /homedel [Name]
+   telepadname:
+      description: Names the last telepad set.
+      usage: /telepadname [Name]
+   telepadlist:
+      description: Lists all the telepads that have been created. If the nearby argument is given, tells you the name and location of the closest telepad
+      usage: /telepadlist (nearby)
+   telepaddel:
+      description: Deletes a telepad by name.
+      usage: /telepaddel [Name]

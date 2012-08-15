@@ -17,6 +17,9 @@ public class TickUpdater implements Runnable {
 			core.currentTick = 0;
 			core.resetTicks();
 		}
+		if (core.currentTick % Core.TIME_BETWEEN_SAVES == 0) {
+			core.runSave();
+		}
 	}
 
 }
