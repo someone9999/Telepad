@@ -23,8 +23,8 @@ public class Core extends JavaPlugin implements Listener{
 	int currentTick = 0;
 
 	private static final String HOMES_SAVE_FILE_NAME = "telepad.sav";
-	private static final int TIME_BETWEEN_USES = 10; //seconds
-	public static final int TIME_BETWEEN_SAVES = 300; //Saves every 5 minutes
+	private static final int TIME_BETWEEN_USES = 600; //seconds
+	public static final int TIME_BETWEEN_SAVES = 1200; //Saves every 5 minutes
 	private static final String TELEPAD_SAVE_FILE_NAME = "teleport.sav";
 	
 	private Location lastSelected = null;
@@ -296,6 +296,14 @@ public class Core extends JavaPlugin implements Listener{
 		PlayerHomes ph = getPlayerHomes(sender.getName());
 		
 		
+		if (p.getHealth() != p.getMaxHealth()) {
+			sender.sendMessage(ChatColor.GRAY + "Can not use /home when damaged!");
+			return true;
+		}
+		if (p.getFoodLevel() < 10) {
+			sender.sendMessage(ChatColor.GRAY + "Can not use /home when hunger is under half!");
+		}
+		
 		String homeName;
 		if (args.length == 0) {
 			homeName = "";
@@ -309,14 +317,14 @@ public class Core extends JavaPlugin implements Listener{
 			return true;
 		}
 		if (homeName != "") {
-			sender.sendMessage(ChatColor.GRAY + "Going to your home called: " + homeName);
+			sender.sendMessage(ChatColor.GRAY + "Going to your home called: " + ChatColor.YELLOW + homeName);
 		} else {
 			sender.sendMessage(ChatColor.GRAY + "Going to your default home.");
 		}
 		
 		int lastUse = getLastPlayerCommand(sender.getName());
 		if (lastUse > this.currentTick - TIME_BETWEEN_USES) {
-			sender.sendMessage(ChatColor.YELLOW + "You can not use /home for another " + (lastUse - (this.currentTick - TIME_BETWEEN_USES)) + " seconds.");
+			sender.sendMessage(ChatColor.GRAY + "You can not use /home for another " + ChatColor.YELLOW + (lastUse - (this.currentTick - TIME_BETWEEN_USES)) + ChatColor.GRAY + " seconds.");
 			return true;
 		}
 		
@@ -365,7 +373,7 @@ public class Core extends JavaPlugin implements Listener{
 		}
 		
 		this.lastUseMap = new HashMap<String, Integer>(0);
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickUpdater(this), TIME_BETWEEN_USES, TIME_BETWEEN_USES);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickUpdater(this), 20, 20);
 		this.getServer().getPluginManager().registerEvents(this, this);
 	}
 	
